@@ -69,7 +69,7 @@ export default defineConfig({
     strictPort: false,
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'credentialless',
+      'Cross-Origin-Embedder-Policy': 'unsafe-none',
       'Service-Worker-Allowed': '/',
     },
     proxy: {

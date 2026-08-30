@@ -342,14 +342,6 @@ function rewriteHtml(html, parsedUrl) {
   });
   const inject = `<script>(function(){window.__bpBase=${JSON.stringify(base)};function p(u){try{if(!u||typeof u!=='string')return u;if(u.indexOf('data:')===0||u.indexOf('blob:')===0||u.indexOf('javascript:')===0||u.indexOf('about:')===0||u.indexOf('mailto:')===0||u.charAt(0)==='#')return u;if(u.indexOf('/proxy?url=')===0)return u;var a=new URL(u,window.__bpBase||document.baseURI);if(a.pathname==='/proxy'||a.pathname.indexOf('/proxy')===0||a.pathname.indexOf('/api')===0||a.pathname.indexOf('/wisp')===0||a.pathname.indexOf('/uv')===0||a.pathname.indexOf('/epoxy')===0||a.pathname.indexOf('/baremux')===0||a.pathname.indexOf('/site')===0)return a.href;var b=new URL(window.__bpBase||document.baseURI);if(a.origin===window.location.origin){return '/proxy?url='+encodeURIComponent(b.protocol+'//'+b.host+a.pathname+a.search+a.hash);}return '/proxy?url='+encodeURIComponent(a.href);}catch(e){return u;}}
 var of=window.fetch;window.fetch=function(i,n){try{if(typeof i==='string')return of(p(i),n);if(i&&typeof Request!=='undefined'&&i instanceof Request)return of(new Request(p(i.url),i),n);if(i&&i.url)return of(new Request(p(i.url),i),n);}catch(e){}return of(i,n);};
-var OW=window.WebSocket;
-function FakeSocket(u){var s=this;this.url=String(u);this.readyState=0;this.binaryType='blob';this.bufferedAmount=0;this.extensions='';this.protocol='';this._q=[];this.onopen=null;this.onmessage=null;this.onerror=null;this.onclose=null;this._qf=[];this.addEventListener=function(t,f){if(t==='open')s.onopen=f;else if(t==='message')s._qf.push(f);else if(t==='close')s.onclose=f;else if(t==='error')s.onerror=f;};this.removeEventListener=function(){};
-setTimeout(function(){s.readyState=1;if(typeof s.onopen==='function')try{s.onopen({type:'open'});}catch(e){}},40);}
-FakeSocket.prototype.send=function(d){this._q.push(d);};
-FakeSocket.prototype.close=function(){this.readyState=3;if(typeof this.onclose==='function')try{this.onclose({type:'close',code:1000,wasClean:true});}catch(e){}};
-window.WebSocket=function(u,pr){try{var a=new URL(u,window.__bpBase||document.baseURI);if(a.protocol==='ws:'||a.protocol==='wss:'){var same=a.host===window.location.host&&(a.pathname==='/wisp'||a.pathname.indexOf('/wisp/')===0);if(!same){return new FakeSocket(u);}}}catch(e){}try{return pr===undefined?new OW(u):new OW(u,pr);}catch(e2){return new FakeSocket(u);}};
-window.WebSocket.prototype=OW.prototype;
-window.WebSocket.CONNECTING=0;window.WebSocket.OPEN=1;window.WebSocket.CLOSING=2;window.WebSocket.CLOSED=3;
 if(window.EventSource){var OE=window.EventSource;window.EventSource=function(u,c){try{return new OE(p(u),c);}catch(e){}return new OE(u,c);};window.EventSource.prototype=OE.prototype;}
 var oo=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(){var a=[].slice.call(arguments);if(typeof a[1]==='string')a[1]=p(a[1]);return oo.apply(this,a);};
 if(navigator.sendBeacon){var osb=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=function(u,d){try{if(typeof u==='string')u=p(u);}catch(e){}return osb(u,d);};}
@@ -509,6 +501,8 @@ app.all('/proxy', async (req, res) => {
     res.set('Access-Control-Allow-Credentials', 'true');
     res.set('X-Proxy-Response', 'true');
     res.set('Permissions-Policy', 'unload=*, fullscreen=*, autoplay=*, camera=*, microphone=*, geolocation=*, payment=*');
+    res.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
     res.removeHeader('Content-Security-Policy');
     res.removeHeader('X-Frame-Options');
     res.send(body);
@@ -1752,7 +1746,7 @@ const routeWisp = wisp.routeRequest || (wisp.default && wisp.default.routeReques
 const server = http.createServer();
 server.on('request', (req, res) => {
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
   app(req, res);
 });
 server.on('upgrade', (req, socket, head) => {
