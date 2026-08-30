@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: batprox
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: BOT_SECRET
+        generateValue: true
+      - key: FELO_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+    disk:
+      name: batprox-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1

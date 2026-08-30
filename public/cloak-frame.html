@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>New Tab</title>
+<link rel="icon" href="/newtab.svg">
+<style>html,body{margin:0;height:100%;background:#000}iframe{border:0;width:100%;height:100%;position:fixed;inset:0}</style>
+</head>
+<body>
+<script>
+var t = new URLSearchParams(location.search).get('target') || '/';
+document.write('<iframe src="' + t.replace(/"/g, '%22') + '" allow="fullscreen; autoplay; clipboard-read; clipboard-write; encrypted-media; picture-in-picture"></iframe>');
+window.addEventListener('message', function(e){
+  if(!e.data || e.data.type !== 'bp-parent') return;
+  if(window.top && window.top !== window){ try { window.top.postMessage(e.data, '*'); } catch(err) {} }
+  if(e.data.title) document.title = e.data.title;
+  if(e.data.icon){ var l = document.querySelector('link[rel*="icon"]') || document.createElement('link'); l.rel = 'icon'; l.href = e.data.icon; document.head.appendChild(l); }
+  if(e.data.redirect){ try { window.top.location.replace(e.data.redirect); } catch(err) { location.replace(e.data.redirect); } }
+});
+</script>
+</body>
+</html>

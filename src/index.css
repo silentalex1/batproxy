@@ -1,0 +1,332 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bp-accent: #c084fc;
+  --bp-accent-2: #818cf8;
+  --bp-glow: 168, 85, 247;
+}
+
+.bp-petal {
+  position: absolute;
+  top: 76px;
+  background: linear-gradient(135deg, #ffe3f1 0%, #f0abfc 55%, #c084fc 100%);
+  border-radius: 100% 4px 100% 4px;
+  box-shadow: 0 0 10px rgba(240, 171, 252, 0.5);
+  animation-name: petal-fall;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+@keyframes petal-fall {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(var(--sway), 26vh) rotate(90deg);
+  }
+  50% {
+    transform: translate(calc(var(--sway) * -0.6), 52vh) rotate(200deg);
+  }
+  75% {
+    transform: translate(var(--sway), 78vh) rotate(300deg);
+  }
+  100% {
+    transform: translate(0, 108vh) rotate(420deg);
+  }
+}
+
+html[data-theme='Cherry Blossom'] .bg-purple-600\/30,
+html[data-theme='Cherry Blossom'] .bg-purple-600\/25,
+html[data-theme='Cherry Blossom'] .bg-purple-400\/20 {
+  background-color: rgba(244, 114, 182, 0.3) !important;
+}
+
+html[data-theme='Cherry Blossom'] .bg-indigo-500\/15,
+html[data-theme='Cherry Blossom'] .bg-indigo-500\/20 {
+  background-color: rgba(192, 132, 252, 0.22) !important;
+}
+
+html[data-theme='Cherry Blossom'] .bg-purple-600\/20,
+html[data-theme='Cherry Blossom'] .bg-purple-400\/20 {
+  background-color: rgba(236, 72, 153, 0.22) !important;
+}
+
+html[data-theme='Cherry Blossom'] .from-purple-600 {
+  --tw-gradient-from: #ec4899 !important;
+}
+html[data-theme='Cherry Blossom'] .to-indigo-600 {
+  --tw-gradient-to: #a855f7 !important;
+}
+html[data-theme='Cherry Blossom'] .focus\:border-purple-500\/70:focus,
+html[data-theme='Cherry Blossom'] .focus\:border-purple-500:focus {
+  border-color: rgba(244, 114, 182, 0.8) !important;
+}
+html[data-theme='Cherry Blossom'] .hover\:border-purple-500\/40:hover,
+html[data-theme='Cherry Blossom'] .hover\:border-purple-500\/50:hover {
+  border-color: rgba(244, 114, 182, 0.5) !important;
+}
+
+html[data-theme='Cherry Blossom'] .bg-green-500\/15 {
+  background-color: rgba(167, 216, 190, 0.15) !important;
+}
+html[data-theme='Cherry Blossom'] .border-green-500\/30 {
+  border-color: rgba(167, 216, 190, 0.35) !important;
+}
+html[data-theme='Cherry Blossom'] .text-green-400 {
+  color: #9fd8b4 !important;
+}
+html[data-theme='Cherry Blossom'] .bg-green-400 {
+  background-color: #9fd8b4 !important;
+}
+html[data-theme='Cherry Blossom'] .bg-green-400\/80 {
+  background-color: rgba(159, 216, 180, 0.8) !important;
+}
+
+html[data-theme='Cherry Blossom'] .bg-black\/40,
+html[data-theme='Cherry Blossom'] .bg-black\/50,
+html[data-theme='Cherry Blossom'] .bg-black\/60 {
+  background-color: rgba(46, 14, 34, 0.55) !important;
+}
+
+html[data-theme='Cherry Blossom'] .border-white\/10,
+html[data-theme='Cherry Blossom'] .border-white\/20 {
+  border-color: rgba(249, 168, 212, 0.28) !important;
+}
+
+html[data-theme='Cherry Blossom'] h1.bg-clip-text {
+  background-image: none !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow: 0 0 26px rgba(244, 114, 182, 0.55), 0 2px 10px rgba(244, 114, 182, 0.4);
+}
+
+.bp-bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 1;
+  animation: bg-fade 0.8s ease;
+}
+
+html[data-bp-has-bg] #root > div {
+  background: transparent !important;
+}
+
+html[data-bp-has-bg] body {
+  background: #000;
+}
+
+html[data-bp-has-bg] .bg-black\/40,
+html[data-bp-has-bg] .bg-black\/50,
+html[data-bp-has-bg] .bg-black\/60 {
+  background-color: rgba(0, 0, 0, 0.55) !important;
+}
+
+html[data-bp-has-bg] p,
+html[data-bp-has-bg] span,
+html[data-bp-has-bg] h1,
+html[data-bp-has-bg] h2,
+html[data-bp-has-bg] h3 {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+@keyframes bg-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.45s ease-in-out;
+}
+
+@keyframes fade-out-up {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-24px);
+  }
+}
+
+.animate-fade-out-up {
+  animation: fade-out-up 0.6s ease-in forwards;
+}
+
+@keyframes fade-down {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.animate-fade-down {
+  animation: fade-down 0.4s ease-out;
+}
+
+.animate-fade-down-out {
+  animation: fade-out-up 0.5s ease-in forwards;
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.08);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+@keyframes settings-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-settings-pop {
+  animation: settings-pop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes bat-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-bat-float {
+  animation: bat-float 4s ease-in-out infinite;
+}
+
+select option {
+  background-color: #12121a;
+  color: #ffffff;
+}
+
+.prose {
+  color: inherit;
+}
+
+.prose strong {
+  color: inherit;
+  font-weight: 700;
+}
+
+.prose em {
+  color: inherit;
+  font-style: italic;
+}
+
+.prose p {
+  margin-bottom: 0.5em;
+}
+
+.prose p:last-child {
+  margin-bottom: 0;
+}
+
+.prose ul {
+  list-style: disc;
+  padding-left: 1.4rem;
+  margin: 0.5rem 0;
+}
+
+.prose ol {
+  list-style: decimal;
+  padding-left: 1.4rem;
+  margin: 0.5rem 0;
+}
+
+.prose li {
+  margin: 0.3rem 0;
+}
+
+.prose li::marker {
+  color: #a855f7;
+}
+
+.prose code {
+  background: rgba(168, 85, 247, 0.12);
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.375rem;
+  font-size: 0.85em;
+}
+
+.prose pre {
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.6rem;
+  padding: 0.8rem;
+  overflow-x: auto;
+}
+
+.prose pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+  font-weight: 700;
+  margin: 0.6rem 0 0.3rem;
+}
