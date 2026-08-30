@@ -119,8 +119,8 @@ function Dashboard() {
               setApprovedFeedback({ id: fresh.id, content: fresh.content, status: fresh.status });
             }
           }
-        } catch (error) {
-          console.error('Error checking notifications:', error);
+        } catch {
+          return;
         }
       }, 300);
     };

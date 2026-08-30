@@ -19,9 +19,14 @@ let uvReady: Promise<void> | null = null;
 function waitForWorker(worker: ServiceWorker | null): Promise<void> {
   if (!worker || worker.state === 'activated') return Promise.resolve();
   return new Promise((resolve) => {
-    const done = () => resolve();
+    let settled = false;
+    const done = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
     worker.addEventListener('statechange', () => {
-      if (worker.state === 'activated' || worker.state === 'redundant') done();
+      if (worker.state === 'activated') done();
     });
   });
 }
@@ -79,10 +84,20 @@ export function initUltraviolet(): Promise<void> {
         '/wisp/';
       const connection = new window.BareMux.BareMuxConnection('/baremux/worker.js');
       const transport = connection.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl }]);
-      const reg = await navigator.serviceWorker.register('/uv/sw.js', { scope: '/uv/' });
+      const reg = await navigator.serviceWorker.register('/uv/sw.js', { scope: '/' });
+      await reg.update();
       await waitForWorker(reg.active || reg.installing || reg.waiting);
       if (!reg.active) {
         await waitForWorker(reg.installing || reg.waiting);
+      }
+      if (!navigator.serviceWorker.controller) {
+        await new Promise<void>((resolve) => {
+          const timeout = window.setTimeout(resolve, 1500);
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            window.clearTimeout(timeout);
+            resolve();
+          }, { once: true });
+        });
       }
       await transport;
     })().catch((err) => {

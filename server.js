@@ -201,13 +201,13 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.static('public'));
 app.use(['/baremux', '/epoxy', '/uv'], (req, res, next) => {
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
   res.setHeader('Service-Worker-Allowed', '/');
   next();
 });
+app.use(express.static('public'));
 app.use('/uv/', express.static(path.join(__dirname, 'public', 'uv')));
 app.use('/uv/', express.static(uvPath));
 app.use('/epoxy/', express.static(epoxyPath));
