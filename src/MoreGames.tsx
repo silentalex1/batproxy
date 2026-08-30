@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import Settings from './Settings';
 import { AmbientBg, BatteryIndicator, SideRail, TopBar, NavBtn } from './Chrome';
-import { MOVIES_URL } from './engines';
 
 declare global {
   interface Window {
@@ -432,10 +431,11 @@ export default function MoreGames() {
           </div>
         )}
         <TopBar>
-          <NavBtn tone="movies" onClick={() => navigate(`/search-engine?url=${encodeURIComponent(MOVIES_URL)}`)}>Movies</NavBtn>
-          <NavBtn onClick={() => setShowSettingsModal(true)}>Settings</NavBtn>
-          <NavBtn onClick={() => setShowSuggestionsModal(true)}>Suggestions</NavBtn>
           <NavBtn onClick={() => navigate('/dashboard')}>Home</NavBtn>
+          <div className="flex items-center gap-2">
+            <NavBtn onClick={() => setShowSuggestionsModal(true)}>Suggestions</NavBtn>
+            <NavBtn onClick={() => setShowSettingsModal(true)}>Settings</NavBtn>
+          </div>
         </TopBar>
 
         <div className="flex-1 flex flex-col items-center max-w-5xl mx-auto w-full">

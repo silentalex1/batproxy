@@ -77,23 +77,14 @@ export default function SearchEngine() {
     }
     setUseSandbox(false);
     setSandboxSrc('');
-    const goUv = () => {
-      if (!skipLoading) armLoadTimeout();
-      setProxySrc(getUvUrl(targetUrl));
-      setIframeKey(prev => prev + 1);
-    };
-    if (window.__uv$config) {
-      goUv();
-      initUltraviolet().catch(() => {
-        setUseSandbox(true);
-        setSandboxSrc(getSandboxUrl(targetUrl));
-        setIframeKey(prev => prev + 1);
-      });
-      return;
-    }
     setProxySrc('');
     initUltraviolet()
-      .then(goUv)
+      .then(() => {
+        if (!window.__uv$config) throw new Error('UV config missing');
+        if (!skipLoading) armLoadTimeout();
+        setProxySrc(getUvUrl(targetUrl));
+        setIframeKey(prev => prev + 1);
+      })
       .catch(() => {
         setUseSandbox(true);
         setSandboxSrc(getSandboxUrl(targetUrl));
@@ -355,7 +346,7 @@ export default function SearchEngine() {
       <SideRail onSettings={() => setShowSettingsModal(true)} />
 
       <main className="relative z-10 flex flex-col h-screen sm:pl-16">
-        <div className="flex items-center gap-2 h-14 px-3 sm:px-4 border-b border-white/10 bg-black/40 backdrop-blur-xl">
+        <div className="flex items-center gap-2 h-14 px-3 sm:px-4 bg-black/40 backdrop-blur-xl">
           <div className="flex items-center gap-1">
             <button onClick={handleBack} disabled={historyIndex <= 0} className="w-8 h-8 rounded-lg text-white/70 hover:bg-white/10 disabled:opacity-30" title="Back">←</button>
             <button onClick={handleForward} disabled={historyIndex >= history.length - 1} className="w-8 h-8 rounded-lg text-white/70 hover:bg-white/10 disabled:opacity-30" title="Forward">→</button>
@@ -363,7 +354,7 @@ export default function SearchEngine() {
             <button onClick={handleHome} className="w-8 h-8 rounded-lg text-white/70 hover:bg-white/10" title="Home">⌂</button>
           </div>
           <form onSubmit={handleSearch} className="flex-1">
-            <div className="relative flex items-center gap-2 bg-white/[0.06] border border-white/10 rounded-full px-4 py-1.5">
+            <div className="relative flex items-center gap-2 bg-[#14141a] rounded-full px-4 py-1.5">
               <svg className="w-4 h-4 text-white/35 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
@@ -378,11 +369,9 @@ export default function SearchEngine() {
               />
             </div>
           </form>
-          <NavBtn tone="movies" onClick={() => navigate(`/search-engine?url=${encodeURIComponent(MOVIES_URL)}`)}>Movies</NavBtn>
           {targetUrl && (
             <NavBtn className="hidden sm:inline-flex" onClick={handleFullscreen}>Fullscreen</NavBtn>
           )}
-          <NavBtn className="hidden md:inline-flex" onClick={() => navigate('/homework#help')}>Games</NavBtn>
           <NavBtn className="hidden md:inline-flex" onClick={() => setShowSettingsModal(true)}>Settings</NavBtn>
           <BatteryIndicator />
         </div>

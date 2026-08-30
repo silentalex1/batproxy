@@ -71,21 +71,25 @@ export default function SubNavbar({ goBackLabel = '< Go back', goBackTo = '/dash
       )}
       <div className="sm:pl-16">
         <TopBar>
-          {checked ? (
-            isAdmin ? (
-              <span className="inline-flex items-center h-7 text-[11px] font-bold tracking-widest px-2.5 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">ADMIN</span>
+          <div className="flex items-center gap-3">
+            {checked ? (
+              isAdmin ? (
+                <span className="inline-flex items-center h-6 text-[10px] font-bold tracking-widest px-2 rounded-md bg-emerald-950/80 text-emerald-300">ADMIN</span>
+              ) : (
+                <span className="w-2 h-2 rounded-full bg-sky-400/70" />
+              )
             ) : (
-              <span className="inline-flex items-center h-7 text-[11px] font-bold tracking-widest px-2.5 rounded-lg bg-sky-500/15 text-sky-300 border border-sky-500/25">Visitor</span>
-            )
-          ) : (
-            <span className="w-16 h-7 rounded-lg bg-white/5 animate-pulse" />
-          )}
-          <NavBtn onClick={() => navigate(goBackTo)}>{goBackLabel}</NavBtn>
-          {showApiDoc && (
-            <NavBtn onClick={() => navigate('/api-status/docs')}>API doc</NavBtn>
-          )}
-          <NavBtn onClick={() => setShowSuggestions(true)}>Suggestions</NavBtn>
-          <NavBtn onClick={() => setShowSettings(true)}>Settings</NavBtn>
+              <span className="w-16 h-7 rounded-full bg-white/5 animate-pulse" />
+            )}
+            <NavBtn onClick={() => navigate(goBackTo)}>{goBackLabel}</NavBtn>
+          </div>
+          <div className="flex items-center gap-2">
+            {showApiDoc && (
+              <NavBtn onClick={() => navigate('/api-status/docs')}>API doc</NavBtn>
+            )}
+            <NavBtn onClick={() => setShowSuggestions(true)}>Suggestions</NavBtn>
+            <NavBtn onClick={() => setShowSettings(true)}>Settings</NavBtn>
+          </div>
         </TopBar>
       </div>
 

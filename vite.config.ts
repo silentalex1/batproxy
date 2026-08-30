@@ -70,6 +70,7 @@ export default defineConfig({
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'credentialless',
+      'Service-Worker-Allowed': '/',
     },
     proxy: {
       '/api/': { target: process.env.VITE_API_URL || 'http://localhost:3000', changeOrigin: true },

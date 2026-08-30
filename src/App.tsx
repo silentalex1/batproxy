@@ -13,7 +13,7 @@ import ApiDocs from './ApiDocs';
 import Chatting from './Chatting';
 import AutoLogout from './AutoLogout';
 import PageChrome from './PageChrome';
-import { AmbientBg, BatteryIndicator, SideRail, TopBar, NavBtn } from './Chrome';
+import { AmbientBg, SideRail, DashNav, RotatingTagline } from './Chrome';
 import { buildSearchUrl, MOVIES_URL } from './engines';
 import { initUltraviolet } from './uv';
 
@@ -224,38 +224,25 @@ function Dashboard() {
       <AmbientBg />
       <SideRail onSettings={() => setShowSettingsModal(true)} />
 
-      <div className="fixed top-4 right-4 z-30">
-        <BatteryIndicator />
-      </div>
-
       <main className="relative z-10 flex flex-col items-center min-h-screen px-4 sm:pl-20 sm:pr-6">
-        <TopBar>
-          <NavBtn
-            tone="danger"
-            onClick={() => {
-              localStorage.removeItem('batprox-token');
-              localStorage.removeItem('batprox-user');
-              navigate('/');
-            }}
-          >
-            Logout
-          </NavBtn>
-          <span className="hidden sm:inline text-[13px] text-white/55 px-2 truncate max-w-[160px]">{username}</span>
-          <span className={'hidden sm:inline-flex items-center h-7 text-[11px] font-bold tracking-widest px-2.5 rounded-lg ' + (isAdmin ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/25' : 'bg-sky-500/15 text-sky-300 border border-sky-500/25')}>{isAdmin ? 'ADMIN' : 'VISITOR'}</span>
-          {isAdmin && (
-            <NavBtn onClick={() => navigate('/admin-panel')}>Admin</NavBtn>
-          )}
-          <NavBtn onClick={() => navigate('/homework#help')}>Games</NavBtn>
-          <NavBtn tone="movies" onClick={() => handleButtonClick('Movies')}>Movies</NavBtn>
-          <NavBtn onClick={() => navigate('/changelog')}>Changelogs</NavBtn>
-          <NavBtn className="hidden md:inline-flex" onClick={() => navigate('/bat-status')}>Status</NavBtn>
-          <NavBtn className="hidden md:inline-flex" onClick={() => setShowSuggestionsModal(true)}>Suggestions</NavBtn>
-          <NavBtn onClick={() => setShowSettingsModal(true)}>Settings</NavBtn>
-        </TopBar>
+        <DashNav
+          username={username}
+          isAdmin={isAdmin}
+          onLogout={() => {
+            localStorage.removeItem('batprox-token');
+            localStorage.removeItem('batprox-user');
+            navigate('/');
+          }}
+          onAdmin={() => navigate('/admin-panel')}
+          onChangelogs={() => navigate('/changelog')}
+          onStatus={() => navigate('/bat-status')}
+          onSuggestions={() => setShowSuggestionsModal(true)}
+          onSettings={() => setShowSettingsModal(true)}
+        />
 
-        <div className="flex-1 flex flex-col items-center justify-center w-full max-w-3xl pb-20 pt-6">
-          <p className="text-[11px] tracking-[0.35em] uppercase text-white/35 mb-3">{clock.date}</p>
-          <div className="flex items-end gap-2 mb-2">
+        <div className="flex-1 flex flex-col items-center justify-start w-full max-w-3xl pt-4 pb-16">
+          <p className="text-[11px] tracking-[0.35em] uppercase text-white/35 mb-1">{clock.date}</p>
+          <div className="flex items-end gap-2 mb-1">
             <h2 className="text-5xl sm:text-7xl font-semibold tracking-tight tabular-nums leading-none" style={{ textShadow: '0 0 28px rgba(var(--bp-glow), 0.35)' }}>
               {clock.hms}
             </h2>
@@ -264,7 +251,13 @@ function Dashboard() {
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-2" style={{ color: 'var(--bp-accent)' }}>
             Bat Prox
           </h1>
-          <p className="text-white/45 text-sm mb-8">Search the web or type a URL</p>
+          <RotatingTagline
+            lines={[
+              'Website took 3 weeks to make.',
+              'Website was only made by an 18 yr old.',
+              'school sucks'
+            ]}
+          />
 
           <form onSubmit={handleSearch} className="w-full max-w-xl relative mb-9">
             <svg className="w-5 h-5 text-white/35 absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">

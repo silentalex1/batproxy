@@ -68,7 +68,7 @@ export function BatteryIndicator() {
         : 'text-rose-400';
 
   return (
-    <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/55 border border-white/10 backdrop-blur-xl shadow-lg ${tone}`}>
+    <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#14141a] shadow-lg ${tone}`}>
       <svg className="w-5 h-5" viewBox="0 0 28 16" fill="none">
         <rect x="0.75" y="0.75" width="23" height="14.5" rx="3.5" stroke="currentColor" strokeWidth="1.6" />
         <rect x="25" y="5" width="2.5" height="6" rx="1.25" fill="currentColor" />
@@ -152,16 +152,15 @@ export function NavBtn({
   className?: string;
 }) {
   const tones = {
-    default: 'text-white/80 hover:text-white hover:bg-white/10',
-    danger: 'text-rose-300 hover:bg-rose-500/15',
-    movies: 'text-white'
+    default: 'text-white/80 hover:text-white bg-[#14141a] hover:bg-[#1c1c24]',
+    danger: 'text-rose-300 bg-[#14141a] hover:bg-[#1c1418]',
+    movies: 'text-white bg-[#b91c1c] hover:bg-[#dc2626]'
   };
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center justify-center h-9 px-4 rounded-xl text-[13px] font-medium whitespace-nowrap transition-all ${tones[tone]} ${className}`}
-      style={tone === 'movies' ? { background: 'linear-gradient(135deg, #ef4444, #b91c1c)' } : undefined}
+      className={`inline-flex items-center justify-center h-10 px-5 rounded-full text-[13px] font-medium whitespace-nowrap transition-colors duration-200 ${tones[tone]} ${className}`}
     >
       {children}
     </button>
@@ -170,11 +169,76 @@ export function NavBtn({
 
 export function TopBar({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full flex justify-center pt-4">
-      <nav className="flex items-center gap-1 h-12 px-2.5 rounded-2xl bg-black/55 border border-white/12 backdrop-blur-xl shadow-2xl max-w-full overflow-x-auto">
+    <div className="w-full px-4 sm:pl-24 sm:pr-6 pt-4">
+      <nav className="flex items-center justify-between gap-3 min-h-[3.5rem] px-3 rounded-2xl bg-black/55 backdrop-blur-xl shadow-2xl overflow-x-auto">
         {children}
       </nav>
     </div>
+  );
+}
+
+export function DashNav({
+  username,
+  isAdmin,
+  onLogout,
+  onAdmin,
+  onChangelogs,
+  onStatus,
+  onSuggestions,
+  onSettings
+}: {
+  username: string;
+  isAdmin: boolean;
+  onLogout: () => void;
+  onAdmin: () => void;
+  onChangelogs: () => void;
+  onStatus: () => void;
+  onSuggestions: () => void;
+  onSettings: () => void;
+}) {
+  return (
+    <TopBar>
+      <div className="flex items-center gap-3 min-w-0">
+        <NavBtn tone="danger" onClick={onLogout}>Logout</NavBtn>
+        <span className="hidden sm:block w-px h-5 bg-white/10" />
+        <span className="hidden sm:flex items-center gap-2 min-w-0">
+          <span className="text-[13px] text-white/70 truncate">Welcome, {username}</span>
+          {isAdmin && (
+            <span className="inline-flex items-center h-6 text-[10px] font-bold tracking-widest px-2 rounded-md bg-emerald-950/80 text-emerald-300">ADMIN</span>
+          )}
+        </span>
+      </div>
+      <div className="flex items-center gap-2">
+        {isAdmin && <NavBtn onClick={onAdmin}>Admin</NavBtn>}
+        <NavBtn onClick={onChangelogs}>Changelogs</NavBtn>
+        <NavBtn className="hidden md:inline-flex" onClick={onStatus}>Status</NavBtn>
+        <NavBtn className="hidden md:inline-flex" onClick={onSuggestions}>Suggestions</NavBtn>
+        <NavBtn onClick={onSettings}>Settings</NavBtn>
+        <BatteryIndicator />
+      </div>
+    </TopBar>
+  );
+}
+
+export function RotatingTagline({ lines }: { lines: string[] }) {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setVisible(false);
+      window.setTimeout(() => {
+        setIndex((n) => (n + 1) % lines.length);
+        setVisible(true);
+      }, 280);
+    }, 3400);
+    return () => clearInterval(id);
+  }, [lines.length]);
+
+  return (
+    <p className={`text-white/45 text-sm mb-8 h-5 transition-opacity duration-300 ease-in-out ${visible ? 'opacity-100' : 'opacity-0'}`}>
+      {lines[index]}
+    </p>
   );
 }
 
@@ -202,33 +266,42 @@ export function SideRail({ onSettings }: { onSettings?: () => void }) {
     if (id === 'settings') onSettings?.();
   };
 
+  const itemClass = (on: boolean) =>
+    `h-12 w-full rounded-xl flex items-center gap-3 px-3.5 overflow-hidden transition-colors duration-200 ${
+      on ? 'text-white bg-white/[0.08]' : 'text-white/50 hover:text-white hover:bg-white/[0.06]'
+    }`;
+
   return (
-    <aside className="fixed left-3 top-1/2 -translate-y-1/2 z-30 hidden sm:flex flex-col gap-1.5 p-1.5 rounded-2xl bg-black/55 border border-white/10 backdrop-blur-xl shadow-2xl">
+    <aside className="group/rail fixed left-3 top-1/2 -translate-y-1/2 z-30 hidden sm:flex flex-col gap-1 p-1.5 rounded-2xl bg-black/70 backdrop-blur-xl shadow-2xl w-[3.65rem] hover:w-48 transition-[width] duration-300 ease-in-out overflow-hidden">
       {RAIL.map((item) => (
         <button
           key={item.id}
           title={item.label}
           onClick={() => go(item.id)}
-          className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${
-            active === item.id
-              ? 'text-white shadow-lg'
-              : 'text-white/45 hover:text-white hover:bg-white/10'
-          }`}
-          style={active === item.id ? { background: 'rgba(var(--bp-glow), 0.32)' } : undefined}
+          className={itemClass(active === item.id)}
+          style={active === item.id ? { background: 'rgba(var(--bp-glow), 0.28)' } : undefined}
         >
-          {item.icon}
+          <span className="shrink-0 w-5 h-5 flex items-center justify-center">{item.icon}</span>
+          <span className="text-[13px] font-medium whitespace-nowrap opacity-0 translate-x-1 group-hover/rail:opacity-100 group-hover/rail:translate-x-0 transition-all duration-300 ease-in-out">
+            {item.label}
+          </span>
         </button>
       ))}
-      <span className="h-px mx-2 my-1 bg-white/10" />
+      <span className="h-px mx-3 my-1 bg-white/10" />
       <button
         title="Settings"
         onClick={() => onSettings?.()}
-        className="w-11 h-11 rounded-xl flex items-center justify-center text-white/45 hover:text-white hover:bg-white/10 transition-all"
+        className={itemClass(false)}
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
+        <span className="shrink-0 w-5 h-5 flex items-center justify-center">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </span>
+        <span className="text-[13px] font-medium whitespace-nowrap opacity-0 translate-x-1 group-hover/rail:opacity-100 group-hover/rail:translate-x-0 transition-all duration-300 ease-in-out">
+          Settings
+        </span>
       </button>
     </aside>
   );
