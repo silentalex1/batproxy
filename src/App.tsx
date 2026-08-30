@@ -255,7 +255,8 @@ function Dashboard() {
             lines={[
               'Website took 3 weeks to make.',
               'Website was only made by an 18 yr old.',
-              'school sucks'
+              'school sucks',
+              "Did you know if you press 'shift+k' it will go in search engine automatically?"
             ]}
           />
 

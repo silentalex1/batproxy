@@ -284,6 +284,27 @@ export default function SearchEngine() {
     setHasError(false);
     const frame = useSandbox ? sandboxRef.current : iframeRef.current;
     try {
+      if (!useSandbox && frame?.contentDocument) {
+        frame.contentDocument.addEventListener('click', (event) => {
+          const target = event.target as HTMLElement | null;
+          const anchor = target?.closest('a');
+          if (!anchor?.href) return;
+          const decoded = decodeProxiedLocation(anchor.href);
+          if (!decoded) return;
+          event.preventDefault();
+          event.stopPropagation();
+          navigate(`/search-engine?url=${encodeURIComponent(decoded)}`);
+        }, true);
+        frame.contentDocument.addEventListener('submit', (event) => {
+          const form = event.target as HTMLFormElement | null;
+          if (!form?.action) return;
+          const decoded = decodeProxiedLocation(form.action);
+          if (!decoded) return;
+          event.preventDefault();
+          event.stopPropagation();
+          navigate(`/search-engine?url=${encodeURIComponent(decoded)}`);
+        }, true);
+      }
       const href = frame?.contentWindow?.location.href;
       if (href) {
         const decoded = decodeProxiedLocation(href);
@@ -410,7 +431,7 @@ export default function SearchEngine() {
                   src={proxySrc}
                   className="w-full h-full border-0"
                   title="Ultraviolet Proxy"
-                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-pointer-lock allow-presentation allow-downloads allow-top-navigation-by-user-activation allow-storage-access-by-user-activation"
+                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-pointer-lock allow-presentation allow-downloads allow-storage-access-by-user-activation"
                   referrerPolicy="strict-origin-when-cross-origin"
                   allow="accelerometer; autoplay; camera; clipboard-read; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; microphone; midi; payment; picture-in-picture; screen-wake-lock; web-share; xr-spatial-tracking; usb; serial; magnetometer"
                   loading="eager"
@@ -425,7 +446,7 @@ export default function SearchEngine() {
                   src={sandboxSrc}
                   className={'w-full h-full border-0' + (!useSandbox && proxySrc ? ' hidden' : '')}
                   title="Sandbox Proxy"
-                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-pointer-lock allow-presentation allow-downloads allow-top-navigation-by-user-activation allow-storage-access-by-user-activation"
+                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-pointer-lock allow-presentation allow-downloads allow-storage-access-by-user-activation"
                   referrerPolicy="strict-origin-when-cross-origin"
                   allow="accelerometer; autoplay; camera; clipboard-read; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; microphone; midi; payment; picture-in-picture; screen-wake-lock; web-share; xr-spatial-tracking; usb; serial; magnetometer"
                   loading="eager"

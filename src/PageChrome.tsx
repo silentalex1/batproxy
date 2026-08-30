@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { applyBackground } from './background';
 import { applyTabCloak } from './tabcloak';
 import { switchDashboardToAboutBlank } from './cloak';
@@ -10,6 +10,7 @@ const NO_BLOSSOM_ROUTES = ['/search-engine', '/homework', '/ai-work'];
 
 export default function PageChrome() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [showBlossom, setShowBlossom] = useState(
     () => getSavedTheme() === 'Cherry Blossom' && !NO_BLOSSOM_ROUTES.includes(window.location.pathname)
   );
@@ -35,6 +36,12 @@ export default function PageChrome() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (e.shiftKey && e.key.toLowerCase() === 'k' && target?.tagName !== 'INPUT' && target?.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        navigate('/search-engine');
+        return;
+      }
       try {
         const s = JSON.parse(localStorage.getItem('batprox-settings') || '{}');
         if (!s.panicKey) return;
@@ -71,7 +78,7 @@ export default function PageChrome() {
       window.removeEventListener('keydown', onKey, true);
       window.removeEventListener('beforeunload', onBeforeUnload);
     };
-  }, []);
+  }, [navigate]);
 
   if (!showBlossom) return null;
   return <Blossom />;
