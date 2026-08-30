@@ -68,15 +68,19 @@ export function initUltraviolet(): Promise<void> {
         location.host +
         '/wisp/';
       const connection = new window.BareMux.BareMuxConnection('/baremux/worker.js');
-      await connection.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl }]);
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(
-        registrations
-          .filter((reg) => !reg.scope.includes('/uv'))
-          .map((reg) => reg.unregister())
-      );
-      await navigator.serviceWorker.register('/uv/sw.js', { scope: '/uv/' });
-      await navigator.serviceWorker.ready;
+      const transport = connection.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl }]);
+      const controlling = navigator.serviceWorker.controller;
+      const uvLive = !!(controlling && controlling.scriptURL.includes('/uv/'));
+      if (!uvLive) {
+        await navigator.serviceWorker.register('/uv/sw.js', { scope: '/uv/' });
+        if (!navigator.serviceWorker.controller) {
+          await Promise.race([
+            navigator.serviceWorker.ready,
+            new Promise<void>((resolve) => setTimeout(resolve, 1200))
+          ]);
+        }
+      }
+      await transport;
     })().catch((err) => {
       uvReady = null;
       throw err;

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import Settings from './Settings';
-import { AmbientBg, BatteryIndicator, SideRail } from './Chrome';
+import { AmbientBg, BatteryIndicator, SideRail, TopBar, NavBtn } from './Chrome';
 import { MOVIES_URL } from './engines';
 
 declare global {
@@ -109,30 +109,49 @@ export default function MoreGames() {
 
       cleanupContainer();
 
+      const LUMIN_CDN = 'https://cdn.jsdelivr.net/gh/luminsdk/script@latest/fonts.min.js';
       const NativeWorker = window.Worker;
       window.Worker = class extends NativeWorker {
         constructor(scriptURL: string | URL, options?: WorkerOptions) {
           const raw = String(scriptURL);
+          if (/^(blob:|data:)/i.test(raw) || /cdn\.jsdelivr\.net\/gh\/luminsdk/i.test(raw) || /\/lumin\.(js|worker\.js)/i.test(raw)) {
+            super(scriptURL, options);
+            return;
+          }
           if (/lumin\.worker|milpagan|drkesten|catholicrebuttals|hpsschools|luminsdk/i.test(raw)) {
-            super('/lumin.worker.js', options);
+            super(LUMIN_CDN, options);
             return;
           }
           super(scriptURL, options);
         }
       } as typeof Worker;
 
+      const nativeFetch = window.fetch.bind(window);
+      window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
+        const href = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+        if (href && /https?:\/\/([a-z0-9.-]+\.)?luminsdk\.com/i.test(href)) {
+          return nativeFetch('/proxy?url=' + encodeURIComponent(href), init);
+        }
+        return nativeFetch(input as RequestInfo, init);
+      }) as typeof fetch;
+
       const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/gh/luminsdk/script@latest/fonts.min.js';
+      script.src = '/lumin.js';
       script.async = true;
-      script.crossOrigin = 'anonymous';
       script.onload = () => {
-        console.log('Lumin SDK loaded successfully');
-        setTimeout(() => initializeLumin(), 200);
+        setTimeout(() => initializeLumin(), 120);
       };
       script.onerror = () => {
-        console.error('Failed to load Lumin SDK');
-        setError('Failed to load Lumin SDK. Please check your internet connection.');
-        setLoading(false);
+        const fallback = document.createElement('script');
+        fallback.src = LUMIN_CDN;
+        fallback.async = true;
+        fallback.crossOrigin = 'anonymous';
+        fallback.onload = () => setTimeout(() => initializeLumin(), 120);
+        fallback.onerror = () => {
+          setError('Failed to load Lumin SDK. Please check your internet connection.');
+          setLoading(false);
+        };
+        document.body.appendChild(fallback);
       };
       document.body.appendChild(script);
     };
@@ -412,35 +431,12 @@ export default function MoreGames() {
             {notice}
           </div>
         )}
-        <div className="w-full flex justify-center py-4">
-          <div className="flex gap-1 px-2 py-1.5 rounded-full bg-black/50 border border-white/10 backdrop-blur-xl shadow-2xl w-full max-w-4xl mx-4 justify-end">
-            <button
-              onClick={() => navigate(`/search-engine?url=${encodeURIComponent(MOVIES_URL)}`)}
-              className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-white"
-              style={{ background: 'linear-gradient(135deg, #ef4444, #b91c1c)' }}
-            >
-              Movies
-            </button>
-            <button
-              onClick={() => setShowSettingsModal(true)}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-white/85 transition-all text-xs font-medium"
-            >
-              Settings
-            </button>
-            <button
-              onClick={() => setShowSuggestionsModal(true)}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-white/85 transition-all text-xs font-medium"
-            >
-              Suggestions
-            </button>
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-white/85 transition-all text-xs font-medium"
-            >
-              Home
-            </button>
-          </div>
-        </div>
+        <TopBar>
+          <NavBtn tone="movies" onClick={() => navigate(`/search-engine?url=${encodeURIComponent(MOVIES_URL)}`)}>Movies</NavBtn>
+          <NavBtn onClick={() => setShowSettingsModal(true)}>Settings</NavBtn>
+          <NavBtn onClick={() => setShowSuggestionsModal(true)}>Suggestions</NavBtn>
+          <NavBtn onClick={() => navigate('/dashboard')}>Home</NavBtn>
+        </TopBar>
 
         <div className="flex-1 flex flex-col items-center max-w-5xl mx-auto w-full">
           <div className="text-center mb-8">

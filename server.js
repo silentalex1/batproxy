@@ -377,24 +377,36 @@ window.addEventListener('error',function(e){if(e&&e.message&&/OW is not defined|
   return out;
 }
 
-app.get('/lumin.worker.js', async (req, res) => {
+const LUMIN_JSDELIVR = 'https://cdn.jsdelivr.net/gh/luminsdk/script@latest/fonts.min.js';
+
+async function sendLuminScript(res) {
   try {
     const response = await axios({
       method: 'GET',
-      url: 'https://a.luminsdk.com/v1/lumin.worker.js',
+      url: LUMIN_JSDELIVR,
       responseType: 'text',
-      timeout: 8000,
+      timeout: 12000,
       validateStatus: () => true
     });
     res.set('Content-Type', 'application/javascript; charset=utf-8');
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.set('Access-Control-Allow-Origin', '*');
     if (response.status >= 400 || !response.data) {
-      return res.send('self.onmessage=function(){};self.postMessage({ready:true});');
+      return res.status(502).send('self.onmessage=function(){};');
     }
     res.send(response.data);
   } catch {
     res.set('Content-Type', 'application/javascript; charset=utf-8');
-    res.send('self.onmessage=function(){};self.postMessage({ready:true});');
+    res.status(502).send('self.onmessage=function(){};');
   }
+}
+
+app.get('/lumin.js', (_req, res) => {
+  sendLuminScript(res);
+});
+
+app.get('/lumin.worker.js', (_req, res) => {
+  sendLuminScript(res);
 });
 
 app.all('/proxy', async (req, res) => {
@@ -1721,7 +1733,7 @@ app.use(express.static(distDir));
 app.get('*', (req, res, next) => {
   if (req.headers['x-original-url']) return next();
   const p = req.path;
-  if (p === '/api' || p.startsWith('/api/') || p.startsWith('/proxy') || p.startsWith('/uv') || p.startsWith('/epoxy') || p.startsWith('/baremux') || p.startsWith('/wisp') || p.startsWith('/site') || p === '/health' || p === '/sw.js' || p === '/uv-sw.js' || p === '/lumin.worker.js' || p.startsWith('/my-games') || p.startsWith('/cdn-cgi')) {
+  if (p === '/api' || p.startsWith('/api/') || p.startsWith('/proxy') || p.startsWith('/uv') || p.startsWith('/epoxy') || p.startsWith('/baremux') || p.startsWith('/wisp') || p.startsWith('/site') || p === '/health' || p === '/sw.js' || p === '/uv-sw.js' || p === '/lumin.js' || p === '/lumin.worker.js' || p.startsWith('/my-games') || p.startsWith('/cdn-cgi')) {
     return next();
   }
   res.sendFile(path.join(distDir, 'index.html'), (err) => {

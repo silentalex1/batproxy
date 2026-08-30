@@ -13,8 +13,9 @@ import ApiDocs from './ApiDocs';
 import Chatting from './Chatting';
 import AutoLogout from './AutoLogout';
 import PageChrome from './PageChrome';
-import { AmbientBg, BatteryIndicator, SideRail } from './Chrome';
+import { AmbientBg, BatteryIndicator, SideRail, TopBar, NavBtn } from './Chrome';
 import { buildSearchUrl, MOVIES_URL } from './engines';
+import { initUltraviolet } from './uv';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -61,6 +62,7 @@ function Dashboard() {
       }
     };
     verify();
+    initUltraviolet().catch(() => {});
 
     const updateTimer = () => {
       const now = new Date();
@@ -227,31 +229,29 @@ function Dashboard() {
       </div>
 
       <main className="relative z-10 flex flex-col items-center min-h-screen px-4 sm:pl-20 sm:pr-6">
-        <div className="w-full flex justify-center pt-5">
-          <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-full bg-black/50 border border-white/10 backdrop-blur-xl shadow-2xl">
-            <button
-              onClick={() => {
-                localStorage.removeItem('batprox-token');
-                localStorage.removeItem('batprox-user');
-                navigate('/');
-              }}
-              className="px-3.5 py-1.5 rounded-full text-xs font-medium text-rose-300 hover:bg-rose-500/15 transition-all"
-            >
-              Logout
-            </button>
-            <span className="hidden sm:inline text-[11px] text-white/50 px-2 truncate max-w-[140px]">{username}</span>
-            <span className={'hidden sm:inline text-[10px] font-bold tracking-widest px-2 py-1 rounded-full ' + (isAdmin ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/25' : 'bg-sky-500/15 text-sky-300 border border-sky-500/25')}>{isAdmin ? 'ADMIN' : 'VISITOR'}</span>
-            {isAdmin && (
-              <button onClick={() => navigate('/admin-panel')} className="px-3.5 py-1.5 rounded-full text-xs font-medium text-white/80 hover:bg-white/10 transition-all">Admin</button>
-            )}
-            <button onClick={() => navigate('/homework#help')} className="px-3.5 py-1.5 rounded-full text-xs font-medium text-white/80 hover:bg-white/10 transition-all">Games</button>
-            <button onClick={() => handleButtonClick('Movies')} className="px-3.5 py-1.5 rounded-full text-xs font-medium text-white/80 hover:bg-white/10 transition-all">Movies</button>
-            <button onClick={() => navigate('/changelog')} className="px-3.5 py-1.5 rounded-full text-xs font-medium text-white/80 hover:bg-white/10 transition-all">Changelogs</button>
-            <button onClick={() => navigate('/bat-status')} className="hidden md:inline px-3.5 py-1.5 rounded-full text-xs font-medium text-white/80 hover:bg-white/10 transition-all">Status</button>
-            <button onClick={() => setShowSuggestionsModal(true)} className="hidden md:inline px-3.5 py-1.5 rounded-full text-xs font-medium text-white/80 hover:bg-white/10 transition-all">Suggestions</button>
-            <button onClick={() => setShowSettingsModal(true)} className="px-3.5 py-1.5 rounded-full text-xs font-medium text-white/80 hover:bg-white/10 transition-all">Settings</button>
-          </div>
-        </div>
+        <TopBar>
+          <NavBtn
+            tone="danger"
+            onClick={() => {
+              localStorage.removeItem('batprox-token');
+              localStorage.removeItem('batprox-user');
+              navigate('/');
+            }}
+          >
+            Logout
+          </NavBtn>
+          <span className="hidden sm:inline text-[13px] text-white/55 px-2 truncate max-w-[160px]">{username}</span>
+          <span className={'hidden sm:inline-flex items-center h-7 text-[11px] font-bold tracking-widest px-2.5 rounded-lg ' + (isAdmin ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/25' : 'bg-sky-500/15 text-sky-300 border border-sky-500/25')}>{isAdmin ? 'ADMIN' : 'VISITOR'}</span>
+          {isAdmin && (
+            <NavBtn onClick={() => navigate('/admin-panel')}>Admin</NavBtn>
+          )}
+          <NavBtn onClick={() => navigate('/homework#help')}>Games</NavBtn>
+          <NavBtn tone="movies" onClick={() => handleButtonClick('Movies')}>Movies</NavBtn>
+          <NavBtn onClick={() => navigate('/changelog')}>Changelogs</NavBtn>
+          <NavBtn className="hidden md:inline-flex" onClick={() => navigate('/bat-status')}>Status</NavBtn>
+          <NavBtn className="hidden md:inline-flex" onClick={() => setShowSuggestionsModal(true)}>Suggestions</NavBtn>
+          <NavBtn onClick={() => setShowSettingsModal(true)}>Settings</NavBtn>
+        </TopBar>
 
         <div className="flex-1 flex flex-col items-center justify-center w-full max-w-3xl pb-20 pt-6">
           <p className="text-[11px] tracking-[0.35em] uppercase text-white/35 mb-3">{clock.date}</p>

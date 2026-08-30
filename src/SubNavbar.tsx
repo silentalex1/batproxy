@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Settings from './Settings';
+import { TopBar, NavBtn } from './Chrome';
 
 interface SubNavbarProps {
   goBackLabel?: string;
@@ -68,46 +69,24 @@ export default function SubNavbar({ goBackLabel = '< Go back', goBackTo = '/dash
           {notice}
         </div>
       )}
-      <div className="w-full flex justify-center py-4 sm:pl-16">
-        <div className="flex gap-2 px-2 py-1.5 rounded-full bg-black/50 border border-white/10 backdrop-blur-xl shadow-2xl w-full max-w-4xl mx-4 justify-between items-center">
+      <div className="sm:pl-16">
+        <TopBar>
           {checked ? (
             isAdmin ? (
-              <span className="text-[10px] font-bold tracking-widest px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">ADMIN</span>
+              <span className="inline-flex items-center h-7 text-[11px] font-bold tracking-widest px-2.5 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">ADMIN</span>
             ) : (
-              <span className="text-[10px] font-bold tracking-widest px-2.5 py-1 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/25">Visitor</span>
+              <span className="inline-flex items-center h-7 text-[11px] font-bold tracking-widest px-2.5 rounded-lg bg-sky-500/15 text-sky-300 border border-sky-500/25">Visitor</span>
             )
           ) : (
-            <span className="w-16 h-6 rounded-full bg-white/5 animate-pulse" />
+            <span className="w-16 h-7 rounded-lg bg-white/5 animate-pulse" />
           )}
-          <div className="flex gap-1">
-            <button
-              onClick={() => navigate(goBackTo)}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-white/85 transition-all text-xs font-medium"
-            >
-              {goBackLabel}
-            </button>
-            {showApiDoc && (
-              <button
-                onClick={() => navigate('/api-status/docs')}
-                className="px-3.5 py-1.5 rounded-full bg-emerald-600/15 hover:bg-emerald-600/30 text-emerald-300 transition-all text-xs font-medium"
-              >
-                API doc
-              </button>
-            )}
-            <button
-              onClick={() => setShowSuggestions(true)}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-white/85 transition-all text-xs font-medium"
-            >
-              Suggestions
-            </button>
-            <button
-              onClick={() => setShowSettings(true)}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-white/85 transition-all text-xs font-medium"
-            >
-              Settings
-            </button>
-          </div>
-        </div>
+          <NavBtn onClick={() => navigate(goBackTo)}>{goBackLabel}</NavBtn>
+          {showApiDoc && (
+            <NavBtn onClick={() => navigate('/api-status/docs')}>API doc</NavBtn>
+          )}
+          <NavBtn onClick={() => setShowSuggestions(true)}>Suggestions</NavBtn>
+          <NavBtn onClick={() => setShowSettings(true)}>Settings</NavBtn>
+        </TopBar>
       </div>
 
       {showSuggestions && (

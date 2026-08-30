@@ -140,6 +140,44 @@ const RAIL: { id: RailId; label: string; icon: React.ReactNode }[] = [
   }
 ];
 
+export function NavBtn({
+  children,
+  onClick,
+  tone = 'default',
+  className = ''
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  tone?: 'default' | 'danger' | 'movies';
+  className?: string;
+}) {
+  const tones = {
+    default: 'text-white/80 hover:text-white hover:bg-white/10',
+    danger: 'text-rose-300 hover:bg-rose-500/15',
+    movies: 'text-white'
+  };
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center justify-center h-9 px-4 rounded-xl text-[13px] font-medium whitespace-nowrap transition-all ${tones[tone]} ${className}`}
+      style={tone === 'movies' ? { background: 'linear-gradient(135deg, #ef4444, #b91c1c)' } : undefined}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function TopBar({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="w-full flex justify-center pt-4">
+      <nav className="flex items-center gap-1 h-12 px-2.5 rounded-2xl bg-black/55 border border-white/12 backdrop-blur-xl shadow-2xl max-w-full overflow-x-auto">
+        {children}
+      </nav>
+    </div>
+  );
+}
+
 export function SideRail({ onSettings }: { onSettings?: () => void }) {
   const navigate = useNavigate();
   const location = useLocation();

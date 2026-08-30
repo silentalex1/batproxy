@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Settings from './Settings';
 import { initUltraviolet, getUvUrl, getSandboxUrl, decodeProxiedLocation } from './uv';
-import { AmbientBg, BatteryIndicator, SideRail } from './Chrome';
+import { AmbientBg, BatteryIndicator, SideRail, NavBtn } from './Chrome';
 import { buildSearchUrl, MOVIES_URL } from './engines';
 
 export default function SearchEngine() {
@@ -48,7 +48,7 @@ export default function SearchEngine() {
       if (loadStampRef.current === stamp) {
         setIsLoading(false);
       }
-    }, 3500);
+    }, 1400);
   };
 
   useEffect(() => {
@@ -76,14 +76,24 @@ export default function SearchEngine() {
       return;
     }
     setUseSandbox(false);
-    setProxySrc('');
     setSandboxSrc('');
-    initUltraviolet()
-      .then(() => {
-        if (!skipLoading) armLoadTimeout();
-        setProxySrc(getUvUrl(targetUrl));
+    const goUv = () => {
+      if (!skipLoading) armLoadTimeout();
+      setProxySrc(getUvUrl(targetUrl));
+      setIframeKey(prev => prev + 1);
+    };
+    if (window.__uv$config) {
+      goUv();
+      initUltraviolet().catch(() => {
+        setUseSandbox(true);
+        setSandboxSrc(getSandboxUrl(targetUrl));
         setIframeKey(prev => prev + 1);
-      })
+      });
+      return;
+    }
+    setProxySrc('');
+    initUltraviolet()
+      .then(goUv)
       .catch(() => {
         setUseSandbox(true);
         setSandboxSrc(getSandboxUrl(targetUrl));
@@ -345,7 +355,7 @@ export default function SearchEngine() {
       <SideRail onSettings={() => setShowSettingsModal(true)} />
 
       <main className="relative z-10 flex flex-col h-screen sm:pl-16">
-        <div className="flex items-center gap-2 px-3 sm:px-4 py-2.5 border-b border-white/10 bg-black/40 backdrop-blur-xl">
+        <div className="flex items-center gap-2 h-14 px-3 sm:px-4 border-b border-white/10 bg-black/40 backdrop-blur-xl">
           <div className="flex items-center gap-1">
             <button onClick={handleBack} disabled={historyIndex <= 0} className="w-8 h-8 rounded-lg text-white/70 hover:bg-white/10 disabled:opacity-30" title="Back">←</button>
             <button onClick={handleForward} disabled={historyIndex >= history.length - 1} className="w-8 h-8 rounded-lg text-white/70 hover:bg-white/10 disabled:opacity-30" title="Forward">→</button>
@@ -368,18 +378,12 @@ export default function SearchEngine() {
               />
             </div>
           </form>
-          <button
-            onClick={() => navigate(`/search-engine?url=${encodeURIComponent(MOVIES_URL)}`)}
-            className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-white"
-            style={{ background: 'linear-gradient(135deg, #ef4444, #b91c1c)' }}
-          >
-            Movies
-          </button>
+          <NavBtn tone="movies" onClick={() => navigate(`/search-engine?url=${encodeURIComponent(MOVIES_URL)}`)}>Movies</NavBtn>
           {targetUrl && (
-            <button onClick={handleFullscreen} className="hidden sm:inline px-3 py-1.5 rounded-full text-xs text-white/70 hover:bg-white/10">Fullscreen</button>
+            <NavBtn className="hidden sm:inline-flex" onClick={handleFullscreen}>Fullscreen</NavBtn>
           )}
-          <button onClick={() => navigate('/homework#help')} className="hidden md:inline px-3 py-1.5 rounded-full text-xs text-white/70 hover:bg-white/10">Games</button>
-          <button onClick={() => setShowSettingsModal(true)} className="hidden md:inline px-3 py-1.5 rounded-full text-xs text-white/70 hover:bg-white/10">Settings</button>
+          <NavBtn className="hidden md:inline-flex" onClick={() => navigate('/homework#help')}>Games</NavBtn>
+          <NavBtn className="hidden md:inline-flex" onClick={() => setShowSettingsModal(true)}>Settings</NavBtn>
           <BatteryIndicator />
         </div>
 
