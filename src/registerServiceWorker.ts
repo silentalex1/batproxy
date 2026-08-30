@@ -7,7 +7,7 @@ if ('serviceWorker' in navigator) {
           .map((reg) => reg.unregister())
       );
     }).then(() => {
-      return navigator.serviceWorker.register('/uv/sw.js', { scope: '/' });
+      return navigator.serviceWorker.register('/uv-sw.js', { scope: '/' });
     }).then(() => {
       console.log('ServiceWorker registration successful');
     }).catch((error) => {

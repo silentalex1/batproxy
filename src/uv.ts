@@ -84,7 +84,7 @@ export function initUltraviolet(): Promise<void> {
         '/wisp/';
       const connection = new window.BareMux.BareMuxConnection('/baremux/worker.js');
       const transport = connection.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl }]);
-      const reg = await navigator.serviceWorker.register('/uv/sw.js', { scope: '/' });
+      const reg = await navigator.serviceWorker.register('/uv-sw.js', { scope: '/' });
       await reg.update();
       await waitForWorker(reg.active || reg.installing || reg.waiting);
       if (!reg.active) {
