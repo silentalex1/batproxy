@@ -77,13 +77,6 @@ export function initUltraviolet(): Promise<void> {
       if (typeof SharedWorker === 'undefined') {
         throw new Error('SharedWorker unavailable');
       }
-      const wispUrl =
-        (location.protocol === 'https:' ? 'wss' : 'ws') +
-        '://' +
-        location.host +
-        '/wisp/';
-      const connection = new window.BareMux.BareMuxConnection('/baremux/worker.js');
-      const transport = connection.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl }]);
       const registrations = await navigator.serviceWorker.getRegistrations();
       await Promise.all(
         registrations
@@ -105,6 +98,13 @@ export function initUltraviolet(): Promise<void> {
           }, { once: true });
         });
       }
+      const wispUrl =
+        (location.protocol === 'https:' ? 'wss' : 'ws') +
+        '://' +
+        location.host +
+        '/wisp/';
+      const connection = new window.BareMux.BareMuxConnection('/baremux/worker.js');
+      const transport = connection.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl }]);
       await transport;
     })().catch((err) => {
       uvReady = null;
