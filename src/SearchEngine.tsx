@@ -424,11 +424,11 @@ export default function SearchEngine() {
                     </div>
                   </div>
                 )}
-                {!useSandbox && proxySrc && (
+                {!useSandbox && (
                 <iframe 
                   key={'uv-' + iframeKey}
                   ref={iframeRef}
-                  src={proxySrc}
+                  src={proxySrc || 'about:blank'}
                   className="w-full h-full border-0"
                   title="Ultraviolet Proxy"
                   sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-pointer-lock allow-presentation allow-downloads allow-storage-access-by-user-activation"
@@ -439,11 +439,11 @@ export default function SearchEngine() {
                   onError={handleIframeError}
                 />
                 )}
-                {useSandbox && sandboxSrc && (
+                {useSandbox && (
                 <iframe 
                   key={'sandbox-' + iframeKey}
                   ref={sandboxRef}
-                  src={sandboxSrc}
+                  src={sandboxSrc || 'about:blank'}
                   className={'w-full h-full border-0' + (!useSandbox && proxySrc ? ' hidden' : '')}
                   title="Sandbox Proxy"
                   sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-pointer-lock allow-presentation allow-downloads allow-storage-access-by-user-activation"
