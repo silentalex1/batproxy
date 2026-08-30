@@ -41,14 +41,19 @@ export default function SearchEngine() {
     }
   };
 
-  const armLoadTimeout = () => {
+  const armLoadTimeout = (targetUrl: string) => {
     clearLoadTimeout();
     const stamp = ++loadStampRef.current;
     loadTimeoutRef.current = setTimeout(() => {
       if (loadStampRef.current === stamp) {
-        setIsLoading(false);
+        setUseSandbox(true);
+        setProxySrc('');
+        setSandboxSrc(getSandboxUrl(targetUrl));
+        setIsLoading(!skipLoading);
+        setHasError(false);
+        setIframeKey(prev => prev + 1);
       }
-    }, 1400);
+    }, 6000);
   };
 
   useEffect(() => {
@@ -81,7 +86,7 @@ export default function SearchEngine() {
     initUltraviolet()
       .then(() => {
         if (!window.__uv$config) throw new Error('UV config missing');
-        if (!skipLoading) armLoadTimeout();
+        if (!skipLoading) armLoadTimeout(targetUrl);
         setProxySrc(getUvUrl(targetUrl));
         setIframeKey(prev => prev + 1);
       })
