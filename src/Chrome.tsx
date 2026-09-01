@@ -196,17 +196,28 @@ export function DashNav({
   onSuggestions: () => void;
   onSettings: () => void;
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <TopBar>
       <div className="flex items-center gap-3 min-w-0">
-        <NavBtn tone="danger" onClick={onLogout}>Logout</NavBtn>
-        <span className="hidden sm:block w-px h-5 bg-white/10" />
-        <span className="hidden sm:flex items-center gap-2 min-w-0">
-          <span className="text-[13px] text-white/70 truncate">Welcome, {username}</span>
-          {isAdmin && (
-            <span className="inline-flex items-center h-6 text-[10px] font-bold tracking-widest px-2 rounded-md bg-emerald-950/80 text-emerald-300">ADMIN</span>
+        <div className="relative">
+          <button type="button" onClick={() => setMenuOpen((open) => !open)} className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.07] px-3 py-2 text-left shadow-lg transition-colors hover:bg-white/[0.12]">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-400 text-sm font-bold text-black">{username.slice(0, 1).toUpperCase()}</span>
+            <span className="hidden min-w-0 sm:block">
+              <span className="block text-[10px] uppercase tracking-[0.18em] text-white/45">Welcome</span>
+              <span className="block max-w-28 truncate text-sm font-semibold text-white">{username}</span>
+            </span>
+            <span className={`text-white/50 transition-transform ${menuOpen ? 'rotate-180' : ''}`}>⌄</span>
+          </button>
+          {menuOpen && (
+            <div className="absolute left-0 top-[calc(100%+0.55rem)] z-50 w-44 rounded-2xl border border-white/10 bg-[#15151c]/95 p-2 shadow-2xl backdrop-blur-xl">
+              {isAdmin && <button type="button" onClick={() => { setMenuOpen(false); onAdmin(); }} className="w-full rounded-xl px-3 py-2 text-left text-sm text-white/75 hover:bg-white/10 hover:text-white">Admin panel</button>}
+              <button type="button" onClick={() => { setMenuOpen(false); onSettings(); }} className="w-full rounded-xl px-3 py-2 text-left text-sm text-white/75 hover:bg-white/10 hover:text-white">Settings</button>
+              <button type="button" onClick={onLogout} className="w-full rounded-xl px-3 py-2 text-left text-sm text-rose-300 hover:bg-rose-500/10">Log out</button>
+            </div>
           )}
-        </span>
+        </div>
       </div>
       <div className="flex items-center gap-2">
         {isAdmin && <NavBtn onClick={onAdmin}>Admin</NavBtn>}
