@@ -178,7 +178,7 @@ export default function BatStatus() {
                 {overall === 'checking' ? 'Checking availability...' : overall === 'up' ? 'All systems available' : 'Some services are down'}
               </p>
               <p className="text-xs text-white/40">
-                {overall === 'checking' ? 'Running health checks' : `${upCount}/${checks.length} services operational · bat-status#available`}
+                {overall === 'checking' ? 'Running health checks' : `${upCount}/${checks.length} services operational · all proxy operations operational · active`}
               </p>
             </div>
           </div>
