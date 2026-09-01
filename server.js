@@ -18,7 +18,7 @@ const { uvPath } = require('@titaniumnetwork-dev/ultraviolet');
 const { epoxyPath } = require('@mercuryworkshop/epoxy-transport');
 const { baremuxPath } = require('@mercuryworkshop/bare-mux/node');
 const wisp = require('wisp-server-node');
-const { resolveDisplayName } = require('./config/admin');
+const { resolveDisplayName } = require('./config/credentials');
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY || require('./config/openrouter').getKey();
 
 const app = express();
