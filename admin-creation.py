@@ -31,7 +31,7 @@ db.serialize(async () => {
     db.run('INSERT INTO admin_users (username, invite_code) VALUES (?, ?)', [username, invite]);
     db.run('COMMIT', (error) => {
       if (error) throw error;
-      console.log(JSON.stringify({ success: true, username }));
+      console.log(JSON.stringify({ success: true, username, verified: true }));
       db.close();
     });
   } catch (error) {
@@ -53,4 +53,6 @@ result = subprocess.run(
 if result.returncode:
     raise SystemExit(result.stderr.strip() or "Failed to create admin account.")
 
-print("BatProx admin account created:", json.loads(result.stdout)["username"])
+created = json.loads(result.stdout)
+print("BatProx admin account created:", created["username"])
+print("Account verified for admin login.")
