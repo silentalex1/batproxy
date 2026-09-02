@@ -65,7 +65,7 @@ export default defineConfig({
   publicDir: 'public',
   assetsInclude: ['**/*.png'],
   server: {
-    port: 5175,
+    port: 5176,
     strictPort: false,
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
