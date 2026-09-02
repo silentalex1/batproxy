@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import SearchEngine from './SearchEngine';
 import AdminPanel from './AdminPanel';
 import MoreGames from './MoreGames';
@@ -430,9 +430,24 @@ function Dashboard() {
   );
 }
 
+function BatnightHashSync() {
+  const location = useLocation();
+  useEffect(() => {
+    const hash = location.pathname === '/' ? '#login1' : location.pathname === '/dashboard' ? '#dashboard' : '';
+    if (hash && window.location.hash !== hash) {
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}${hash}`);
+    }
+  }, [location.pathname, location.search]);
+  return null;
+}
+
 export default function App() {
+  const basename = window.location.pathname === '/batnight' || window.location.pathname.startsWith('/batnight/')
+    ? '/batnight'
+    : undefined;
   return (
-    <Router>
+    <Router basename={basename}>
+      {basename && <BatnightHashSync />}
       <AutoLogout />
       <PageChrome />
       <Routes>
