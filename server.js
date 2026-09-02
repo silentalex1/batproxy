@@ -1036,6 +1036,10 @@ app.get('/api/suggestions/:userIdentifier', (req, res) => {
   );
 });
 
+app.get('/api/auth/login', (req, res) => {
+  res.status(405).json({ error: 'Use POST /api/auth/login to authenticate' });
+});
+
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, inviteCode } = req.body;
