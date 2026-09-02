@@ -1,42 +1,57 @@
 import getpass
+import json
 import os
-import sqlite3
+import subprocess
+import sys
 
+username = input("Enter account username you want: ").strip()
+if not 3 <= len(username) <= 20:
+    raise SystemExit("Username must be between 3 and 20 characters.")
 
-def main():
-    database = os.path.join(os.path.dirname(os.path.abspath(__file__)), "database.sqlite")
-    username = input("Enter account username you want: ").strip()
-    invite_code = getpass.getpass("enter account invite code for that account: ").strip()
+invite_code = input("enter account invite code for that account. ").strip()
+if not invite_code:
+    raise SystemExit("An invite code is required.")
 
-    if not 3 <= len(username) <= 20:
-        raise SystemExit("Username must be between 3 and 20 characters.")
-    if not invite_code:
-        raise SystemExit("Invite code cannot be empty.")
+password = getpass.getpass("Enter account password: ")
+if len(password) < 8:
+    raise SystemExit("Password must be at least 8 characters.")
 
-    connection = sqlite3.connect(database)
-    try:
-        connection.execute(
-            "CREATE TABLE IF NOT EXISTS admin_users ("
-            "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-            "username TEXT UNIQUE NOT NULL, "
-            "invite_code TEXT NOT NULL, "
-            "created_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
-        )
-        connection.execute("DELETE FROM admin_users")
-        connection.execute("DELETE FROM admin_accounts")
-        connection.execute(
-            "INSERT INTO admin_users (username, invite_code) VALUES (?, ?)",
-            (username, invite_code),
-        )
-        connection.commit()
-    except sqlite3.IntegrityError as error:
-        connection.rollback()
-        raise SystemExit(f"Unable to create account: {error}") from error
-    finally:
-        connection.close()
+database = os.path.join(os.path.dirname(os.path.abspath(__file__)), "database.sqlite")
+script = r"""
+const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcrypt');
+const [database, username, password, invite] = process.argv.slice(1);
+const db = new sqlite3.Database(database);
+db.serialize(async () => {
+  try {
+    const hash = await bcrypt.hash(password, 12);
+    db.run('BEGIN TRANSACTION');
+    db.run('DELETE FROM admin_accounts');
+    db.run('DELETE FROM admin_users');
+    db.run('INSERT INTO admin_accounts (username, password_hash) VALUES (?, ?)', [username, hash]);
+    db.run('INSERT INTO admin_users (username, invite_code) VALUES (?, ?)', [username, invite]);
+    db.run('COMMIT', (error) => {
+      if (error) throw error;
+      console.log(JSON.stringify({ success: true, username }));
+      db.close();
+    });
+  } catch (error) {
+    db.run('ROLLBACK', () => {
+      console.error(error.message);
+      db.close();
+      process.exitCode = 1;
+    });
+  }
+});
+"""
 
-    print(f"Admin account '{username}' was created and validated.")
+result = subprocess.run(
+    ["node", "-e", script, database, username, password, invite_code],
+    cwd=os.path.dirname(os.path.abspath(__file__)),
+    capture_output=True,
+    text=True,
+)
+if result.returncode:
+    raise SystemExit(result.stderr.strip() or "Failed to create admin account.")
 
-
-if __name__ == "__main__":
-    main()
+print("BatProx admin account created:", json.loads(result.stdout)["username"])
