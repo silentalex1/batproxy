@@ -1,4 +1,3 @@
-import getpass
 import json
 import os
 import subprocess
@@ -12,7 +11,7 @@ invite_code = input("enter account invite code for that account. ").strip()
 if not invite_code:
     raise SystemExit("An invite code is required.")
 
-password = getpass.getpass("Enter account password: ")
+password = input("Enter account password: ").strip()
 if len(password) < 8:
     raise SystemExit("Password must be at least 8 characters.")
 
